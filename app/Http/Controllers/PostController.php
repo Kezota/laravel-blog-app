@@ -8,6 +8,11 @@ use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
+    public function search($term) {
+        $posts = Post::search($term)->get();
+        return $posts;
+    }
+
     public function actuallyUpdate(Post $post, Request $request) {
         $incomingFields = $request->validate([
             'title' => 'required',
