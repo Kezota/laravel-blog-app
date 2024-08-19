@@ -69,6 +69,18 @@ class UserController extends Controller
         return view('profile-following', ['following' => $user->following()->latest()->get()]);
     }
 
+    public function profileRaw(User $user) {
+        return response()->json(['theHTML' => view('profile-posts-only', ['posts' => $user->posts()->latest()->get()])->render(), 'docTitle' => $user->username . "'s profile"]);
+    }
+
+    public function profileFollowersRaw(User $user) {
+        return response()->json(['theHTML' => view('profile-followers-only', ['followers' => $user->followers()->latest()->get()])->render(), 'docTitle' => $user->username . "'s Followers"]);
+    }
+
+    public function profileFollowingRaw(User $user) {
+        return response()->json(['theHTML' => view('profile-following-only', ['following' => $user->following()->latest()->get()])->render(), 'docTitle' => 'Who ' . $user->username . ' Follows']);
+    }
+
     public function showCorrectHomepage() {
         if (auth()->check()) {
             return view('homepage-feed', ['posts' => auth()->user()->feedPosts()->latest()->paginate(4)]);
