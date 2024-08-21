@@ -16,6 +16,21 @@ use Intervention\Image\ImageManager;
 
 class UserController extends Controller
 {
+    public function loginApi(Request $request) {
+        $incomingFields = $request->validate([
+            'username' => 'required',
+            'password' => 'required'
+        ]);
+
+        if (auth()->attempt($incomingFields)) {
+            $user = User::where('username', $incomingFields['username'])->first();
+            $token = $user->createToken('ourapptoken')->plainTextToken;
+            return $token;
+        } else {
+            return response()->json(['error' => 'Invalid login'], 401);
+        }
+    }
+
     public function storeAvatar(Request $request) {
         $request->validate([
             'avatar' => 'required|image|max:5000'

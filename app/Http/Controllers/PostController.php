@@ -9,6 +9,28 @@ use Illuminate\Support\Str;
 
 class PostController extends Controller
 {
+    public function deleteApi(Post $post) {
+        $post->delete();
+        return 'true';
+    }
+
+    public function storeNewPostApi(Request $request) {
+        $incomingFields = $request->validate([
+            'title' => 'required',
+            'body' => 'required'
+        ]);
+
+        $incomingFields['title'] = strip_tags($incomingFields['title']);
+        $incomingFields['body'] = strip_tags($incomingFields['body']);
+        $incomingFields['user_id'] = auth()->id();
+
+        $newPost = Post::create($incomingFields);
+
+        dispatch(new SendNewPostEmail(['sendTo' => auth()->user()->email, 'title' => $newPost->title, 'name' => auth()->user()->username]));
+
+        return $newPost->id;
+    }
+
     public function search($term) {
         $posts = Post::search($term)->get();
         $posts->load('user:id,username,avatar');
